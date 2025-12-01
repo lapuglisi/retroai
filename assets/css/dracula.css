@@ -1,0 +1,59 @@
+@font-face {
+  font-family: 'Terminus';
+  font-style: normal;
+	font-weight: normal;
+	font-size: 12pt;
+  src: local('Terminus'), url('../fonts/terminus.ttf') format('truetype');
+}
+
+#termInput {
+	background-color: #282A36;
+	font-family: 'Terminus';
+	color: #50FA7B;
+	font-size: 14pt;
+	border-style: hidden;
+	width: 100%;
+	height: 20px;
+}
+
+#termInput:focus {
+	outline: none;
+	border-style: none;
+}
+
+#termOutput {
+	font-family: 'Terminus';
+	font-size: 14pt;
+	background-color: #282A36;
+	color: #50FA7B;
+	padding-bottom: 5px;
+	line-height: 1.5;
+}
+
+.banner {
+	font-family: 'Terminus';
+	font-size: 20pt;
+	text-align: center;
+	border: 1px solid #BD93F9;
+	color: #F8F8F2;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.body {
+	background-color: #282A36;
+}
+
+.termps1 {
+	font-family: 'Terminus';
+	font-size: 14pt;
+	font-weight: bold;
+	background-color: #282A36;
+	color: #50FA7B;
+}
+
+.aiChatStart {
+	background-color: #50FA7B;
+	color: #282A36;
+	padding: 5px 5px 5px 5px;
+}

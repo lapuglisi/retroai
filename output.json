@@ -1,0 +1,16 @@
+{
+	"choices": [{
+		"finish_reason":null,
+		"index":0,
+		"delta":{
+			"role":"assistant",
+			"content":null
+		}
+	}],
+	"created":1762132993,
+	"id":"chatcmpl-FwgNJkzlRCL6WbipBt0Mot27z4Cibm0Y",
+	"model":"gpt-3.5-turbo",
+	"system_fingerprint":"b6866-8284efc35",
+	"object":"chat.completion.chunk"
+},
+data: {"choices":[{"finish_reason":null,"index":0,"delta":{"content":"\""}}],"created":1762132993,"id":"chatcmpl-FwgNJkzlRCL6WbipBt0Mot27z4Cibm0Y","model":"gpt-3.5-turbo","system_fingerprint":"b6866-8284efc35","object":"chat.completion.chunk"}	
