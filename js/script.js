@@ -5,8 +5,10 @@ var shellHistory = {
 
 // Globals come here
 var ShellEnvironment = {
-	RETROAI_API_URL: "https://llm.luizpuglisi.me/v1",
-	RETROAI_API_PATH: "/chat/completions",
+	/*RETROAI_API_URL: "https://llm.luizpuglisi.me/v1",*/
+	RETROAI_API_URL: "https://rag.luizpuglisi.me",
+	/* RETROAI_API_PATH: "/chat/completions", */
+	RETROAI_API_PATH: "/api/completion",
 	RETROAI_API_KEY: null,
 	RETROAI_API_TEMPERATURE: 0.8,
 	RETROAI_API_STREAM_LIMIT: -1,
@@ -241,6 +243,7 @@ async function queryApi(role, args) {
 async function sendAPIRequest(role, args) {
 	try {
 		var error = null;
+		/*
 		const jsonParams = {
 			stream: true,
 			messages: [{
@@ -250,6 +253,11 @@ async function sendAPIRequest(role, args) {
 				no_perf: true
 			}],
 			temperature: ShellEnvironment.RETROAI_API_TEMPERATURE
+		};
+		*/
+
+		const jsonParams = {
+			prompt: args
 		};
 
 		apiUrl = ShellEnvironment.RETROAI_API_URL + ShellEnvironment.RETROAI_API_PATH;
@@ -278,7 +286,7 @@ async function sendAPIRequest(role, args) {
 
 			cancelRequested = false;
 			while (true && !cancelRequested) {
-				const {value, done} = await reader.read();
+				const {jsonData, done} = await reader.read();
 				if (done) {
 					break;
 				}
@@ -288,29 +296,25 @@ async function sendAPIRequest(role, args) {
 				try
 				{
 					// A hell of a workaround
-					const jsonData = value.toString().split(/data\:\s*/i);
-					for (const data of jsonData)
+					console.log("jsonData is " + jsonData);
+					if (jsonData == undefined || jsonData.length == 0) {
+						continue;
+					}
+
+					json = JSON.parse(jsonData);
+					if (json.choices && json.choices.length > 0)
 					{
-						console.log(data);
-						if (data.length == 0) {
-							continue;
-						}
-
-						json = JSON.parse(data);
-						if (json.choices && json.choices.length > 0)
+						if (json.choices[0].delta)
 						{
-							if (json.choices[0].delta)
-							{
-								var content = json.choices[0].delta.content;
-								if (! content) {
-									continue;
-								}
-
-								content = content.replace("\n", "<br/>");
-								content = content.replace("\r", "<br/>");
-
-								addOutput(content, true, false);
+							var content = json.choices[0].delta.content;
+							if (! content) {
+								continue;
 							}
+
+							content = content.replace("\n", "<br/>");
+							content = content.replace("\r", "<br/>");
+
+							addOutput(content, true, false);
 						}
 					}
 				}
