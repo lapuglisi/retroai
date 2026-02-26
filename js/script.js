@@ -10,7 +10,7 @@ var ShellEnvironment = {
 	/* RETROAI_API_PATH: "/chat/completions", */
 	RETROAI_API_PATH: "/api/completion",
 	RETROAI_API_KEY: null,
-	RETROAI_API_TEMPERATURE: 0.8,
+	RETROAI_API_TEMPERATURE: 0.7,
 	RETROAI_API_STREAM_LIMIT: -1,
 	RETROAI_STATUS_THINKING: "RetroAI is thinking... Press [Ctrl-C]; to abort.",
 	RETROAI_STATUS_DONE: "Your data is ready.",
@@ -257,7 +257,8 @@ async function sendAPIRequest(role, args) {
 		*/
 
 		const jsonParams = {
-			prompt: args
+			prompt: args,
+			temperature: ShellEnvironment.RETRO_API_TEMPERATURE
 		};
 
 		apiUrl = ShellEnvironment.RETROAI_API_URL + ShellEnvironment.RETROAI_API_PATH;
@@ -279,6 +280,7 @@ async function sendAPIRequest(role, args) {
 		};
 
 		const response = await fetch(apiUrl, fetchArgs);
+		var data = null
 
 		if (response.ok) {
 			const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
@@ -286,7 +288,7 @@ async function sendAPIRequest(role, args) {
 
 			cancelRequested = false;
 			while (true && !cancelRequested) {
-				const {jsonData, done} = await reader.read();
+				const {value, done} = await reader.read();
 				if (done) {
 					break;
 				}
@@ -295,32 +297,47 @@ async function sendAPIRequest(role, args) {
 				// understand it
 				try
 				{
+					data = null
 					// A hell of a workaround
-					console.log("jsonData is " + jsonData);
-					if (jsonData == undefined || jsonData.length == 0) {
+					if (value == undefined || value.length == 0) {
+						console.log("value is empty")
 						continue;
 					}
 
-					json = JSON.parse(jsonData);
-					if (json.choices && json.choices.length > 0)
-					{
-						if (json.choices[0].delta)
-						{
-							var content = json.choices[0].delta.content;
-							if (! content) {
-								continue;
-							}
-
-							content = content.replace("\n", "<br/>");
-							content = content.replace("\r", "<br/>");
-
-							addOutput(content, true, false);
-						}
+					jsonData = value.split(/data:\s*/i)
+					if (jsonData == undefined || jsonData.length < 2) {
+						continue;
 					}
+					
+					for (const data of jsonData)
+					{
+						if (data == null || data.length == 0) {
+							// Empty data
+							continue;
+						}
+
+						json = JSON.parse(data);
+						if (json.choices && json.choices.length > 0)
+						{
+							if (json.choices[0].delta)
+							{
+								var content = json.choices[0].delta.content;
+								if (null == content) {
+									continue;
+								}
+
+								content = content.replace("\n", "<br/>");
+								content = content.replace("\r", "<br/>");
+
+								addOutput(content, true, false);
+							}
+						}
+					} // for (data of jsonData)
 				}
 				catch (e)
 				{
 					console.error(e);
+					console.log("invalid data is " + data)
 				}
 
 				if (ShellEnvironment.RETROAI_API_STREAM_LIMIT > 0 &&
